@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quick-app
+  labels:
+    app: quick-app
+spec:
+  selector:
+    matchLabels:
+      app: quick-app
+  template:
+    metadata:
+      labels:
+        app: quick-app
+    spec:
+      containers:
+      - name: quick-app
+        image: davidegalifi/quick-service:latest
+        ports:
+        - containerPort: 8080
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+          limits:
+            cpu: 100m
+            memory: 256Mi
+        env:
+        - name: MESSAGE
+          value: "Hello from EKS POC"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: quick-app-service
+spec:
+  selector:
+    app: quick-app
+  ports:
+    - protocol: TCP
+      port: 10002
+      targetPort: 8080
+
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: quick-app
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: quick-app
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 70
