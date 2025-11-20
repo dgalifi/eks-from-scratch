@@ -1,0 +1,65 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: alb-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: alb-app
+  template:
+    metadata:
+      labels:
+        app: alb-app
+    spec:
+      containers:
+        - name: alb-app
+          image: davidegalifi/quick-service:latest
+          ports:
+            - name: http
+              containerPort: 8080
+          resources:
+            requests:
+              memory: 128Mi
+              cpu: 100m
+            limits:
+              memory: 128Mi
+              cpu: 100m
+          env:
+          - name: MESSAGE
+            value: "Hello from ALB app"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: alb-app
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8080
+      targetPort: http
+  selector:
+    app: alb-app
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: alb-app
+  annotations:
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/healthcheck-path: /
+spec:
+  ingressClassName: alb
+  rules:
+    - host: eks-from-scratch.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: alb-app
+                port:
+                  number: 8080

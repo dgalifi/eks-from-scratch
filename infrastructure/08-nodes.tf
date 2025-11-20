@@ -45,10 +45,10 @@ resource "aws_eks_node_group" "general" {
   ]
 
   capacity_type  = "SPOT"
-  instance_types = ["t2.micro"]
+  instance_types = ["t3.large"]
 
   scaling_config {
-    desired_size = 7
+    desired_size = 5
     max_size     = 10
     min_size     = 0
   }

@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: nlb-service
+  name: nlb-app
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: nlb-service
+      app: nlb-app
   template:
     metadata:
       labels:
-        app: nlb-service
+        app: nlb-app
     spec:
       containers:
-        - name: nlb-service
+        - name: nlb-app
           image: davidegalifi/quick-service:latest
           ports:
             - name: http
@@ -27,14 +27,14 @@ spec:
               cpu: 100m
           env:
           - name: MESSAGE
-            value: "Hello from NLB service"
+            value: "Hello from NLB app"
 ---
 # Supported annotations
 # https://kubernetes-sigs.github.io/aws-load-balancer-controller/v2.7/guide/service/annotations/
 apiVersion: v1
 kind: Service
 metadata:
-  name: nlb-service
+  name: nlb-app
   annotations:
     service.beta.kubernetes.io/aws-load-balancer-type: external
     service.beta.kubernetes.io/aws-load-balancer-nlb-target-type: ip
@@ -46,4 +46,4 @@ spec:
     - port: 8080
       targetPort: http
   selector:
-    app: nlb-service
+    app: nlb-app
