@@ -146,7 +146,7 @@ The load balancer controller allows us to create AWS load balancers as service o
 move to k8s folder and run
 
 ```
-kubectl apply -f nlb-service.yaml
+kubectl apply -f nlb-app.yaml
 ```
 
 this will create a deployment for the app and a service of type LoadBalancer.
@@ -158,7 +158,7 @@ Grab the DNS NLB name and hit
 
 http://<nlb_dns>:8080
 
-this should hit our nlb-service pod
+this should hit our nlb-app pod
 
 port is 8080 because we configured it in the LoadBalancer service
 
@@ -172,10 +172,10 @@ spec:
 
 delete the service and deployment if you don't need it anymore
 ```
-kubectl delete -f nlb-service.yaml
+kubectl delete -f nlb-app.yaml
 ```
 
-## deploy alb-service
+## deploy alb-app
 
 This will create an ingress through the controller.
 
@@ -187,7 +187,7 @@ kubectl get ingressclass
 Let's a plain ingree to expose our application 
 
 ```
-kubectl apply -f alb-service.yaml
+kubectl apply -f alb-app.yaml
 ```
 
 this will create and deployment for the app, a service and an ingress
@@ -202,12 +202,12 @@ rules:
             pathType: Prefix
             backend:
               service:
-                name: alb-service
+                name: alb-app
                 port:
                   number: 8080
 ```
 
-This will also create a target group for port 8080 linked to the alb-service app
+This will also create a target group for port 8080 linked to the alb-app app
 
 To check the ingresses run
 
